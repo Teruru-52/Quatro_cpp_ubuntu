@@ -18,7 +18,8 @@ namespace undercarriage
 
     void Controller::PartyTrick(std::vector<float> cur_pos, std::vector<float> cur_vel)
     {
-        u_v = pid_traslational_vel.Update(-cur_vel[0]);
+        // u_v = pid_traslational_vel.Update(-cur_vel[0]);
+        u_v = 0.0;
         u_w = pid_angle.Update(-cur_pos[2]) + pid_rotational_vel.Update(-cur_vel[1]);
         InputVelocity(u_v, u_w);
     }
@@ -60,6 +61,6 @@ namespace undercarriage
 
     void Controller::MotorTest()
     {
-        motor.Drive(1.5, 1.5); // voltage [V]
+        motor.Drive(3.0, 3.0); // voltage [V]
     }
 }

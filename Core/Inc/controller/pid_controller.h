@@ -11,7 +11,7 @@ public:
     Integrator(float control_period);
 
     float Update(float error);
-    float ResetIntegrator();
+    void ResetIntegrator();
 
 private:
     float control_period;
@@ -24,7 +24,7 @@ public:
     Differentiator(float tf, float control_period);
 
     float Update(float error);
-    float ResetDifferentiator();
+    void ResetDifferentiator();
 
 private:
     float tf;
@@ -40,7 +40,7 @@ public:
     PID(float kp, float ki, float kd, float tf, float control_period);
 
     float Update(float error);
-    float ResetPID();
+    void ResetPID();
 
 private:
     float kp;

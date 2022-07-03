@@ -10,7 +10,7 @@ float Integrator::Update(float error)
     return error_sum;
 }
 
-float Integrator::ResetIntegrator()
+void Integrator::ResetIntegrator()
 {
     error_sum = 0.0;
 }
@@ -30,7 +30,7 @@ float Differentiator::Update(float error)
     return pre_deriv;
 }
 
-float Differentiator::ResetDifferentiator()
+void Differentiator::ResetDifferentiator()
 {
     pre_error = 0.0;
 }
@@ -47,7 +47,7 @@ float PID::Update(float error)
     return kp * error + ki * integrator.Update(error) + kd * differentiator.Update(error);
 }
 
-float PID::ResetPID()
+void PID::ResetPID()
 {
     integrator.ResetIntegrator();
     differentiator.ResetDifferentiator();

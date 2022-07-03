@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include <vector>
+#include <cmath>
 #include "hardware/encoder.h"
 #include "hardware/imu.h"
 
@@ -15,6 +16,11 @@ namespace undercarriage
         hardware::IMU imu;
 
         float sampling_period; // [s]
+        float v;
+        float omega;
+        float x;
+        float y;
+        float theta;
 
     public:
         Odometory(float sampling_period);
@@ -24,14 +30,7 @@ namespace undercarriage
         void ResetOdometory();
         std::vector<float> GetPosition();
         std::vector<float> GetVelocity();
-
-        float v;
-        float omega;
-        float x;
-        float y;
-        float theta;
-        std::vector<float> cur_pos;
-        std::vector<float> cur_vel;
+        void OutputLog();
     };
 } //  namespace undercarriage
 #endif //  ODOMETORY_HPP_

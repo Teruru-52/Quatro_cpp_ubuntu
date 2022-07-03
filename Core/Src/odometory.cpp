@@ -1,7 +1,5 @@
 #include "odometory.h"
 
-#include <cmath>
-
 namespace undercarriage
 {
   Odometory::Odometory(float sampling_period)
@@ -37,6 +35,7 @@ namespace undercarriage
 
   std::vector<float> Odometory::GetPosition()
   {
+    std::vector<float> cur_pos{3};
     cur_pos[0] = x;
     cur_pos[1] = y;
     cur_pos[2] = theta;
@@ -45,8 +44,15 @@ namespace undercarriage
 
   std::vector<float> Odometory::GetVelocity()
   {
+    std::vector<float> cur_vel{2};
     cur_vel[0] = v;
     cur_vel[1] = omega;
     return cur_vel;
+  }
+
+  void Odometory::OutputLog()
+  {
+    // printf("%f, %f\n", theta, omega);
+    // printf("%f, %f\n", x, y);
   }
 } //  namespace undercarriage

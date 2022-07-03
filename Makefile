@@ -123,7 +123,9 @@ AS_DEFS =
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
 -DSTM32F405xx \
--DARM_MATH_CM4 
+-DARM_MATH_CM4 \
+'-D__weak=__attribute__((weak))' \
+'-D__packed=__attribute__((__packed__))'
 
 CPP_DEFS = $(C_DEFS)
 

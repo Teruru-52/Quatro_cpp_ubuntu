@@ -56,7 +56,10 @@
         "typeinfo": "cpp",
         "adc.h": "c",
         "dma.h": "c",
-        "gpio.h": "c"
+        "gpio.h": "c",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "iostream": "cpp"
     },
     "C_Cpp.errorSquiggles": "EnabledIfIncludesResolve"
 }

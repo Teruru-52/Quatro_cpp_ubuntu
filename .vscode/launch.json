@@ -11,7 +11,7 @@
             "servertype": "openocd",
             "configFiles": [
                 "interface/stlink-v2-1.cfg",
-                "target/stm32f4.cfg"
+                "target/stm32f4x.cfg"
                 // "board/st_nucleo_f4.cfg"
             ],
         }

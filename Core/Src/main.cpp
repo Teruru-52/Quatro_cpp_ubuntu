@@ -18,6 +18,9 @@
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <vector>
+#include <cmath>
+
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
@@ -25,7 +28,6 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "my_header.h"
@@ -74,41 +76,42 @@ char stop_movement = 'o';
 int cnt16kHz = 0;
 int cnt1kHz = 0;
 
-std::vector<float> cur_p;
-std::vector<float> cur_v;
+std::vector<float> cur_pos{3};
+std::vector<float> cur_vel{2};
 std::vector<uint32_t> ir_data;
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (mode != initialization)
   {
-    if (htim == &htim1) //割込み16kHz
+    if (htim == &htim1) // interruption 16kHz
     {
       irsensors.UpdateSideValue();
       irsensors.UpdateFrontValue();
 
       cnt16kHz = (cnt16kHz + 1) % 16;
 
-      if (cnt16kHz == 0) //割込み1kHz
+      if (cnt16kHz == 0) // interruption 1kHz
       {
         cnt1kHz = (cnt1kHz + 1) % 1000;
         controller.UpdateBatteryVoltage(irsensors.GetBatteryVoltage());
         irsensors.Update();
         ir_data = irsensors.GetIRSensorData();
         odom.Update();
-        cur_p = odom.GetPosition();
-        cur_v = odom.GetVelocity();
+        cur_pos = odom.GetPosition();
+        cur_vel = odom.GetVelocity();
 
-        controller.PartyTrick(cur_p, cur_v);
+        // controller.PartyTrick(cur_pos, cur_vel);
 
-        if (cnt1kHz % 1000 == 0)
+        if (cnt1kHz == 0)
         {
           led.on_back_right();
+          // odom.OutputLog();
+          printf("%f, %f\n", cur_pos[2], cur_vel[1]);
+          // printf("%lu\n", ir_data[0]);
         }
         else
           led.off_back_right();
-
-        // controller.MotorTest();
 
         // else if(mode == slalom){
 
@@ -126,9 +129,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -196,7 +199,7 @@ int main(void)
     // led.on_all();
     if (mode == initialization)
     {
-      irsensors.UpdateFrontValue();
+      irsensors.UpdateFrontValue(); // Read Battery Voltage
       if (irsensors.StartInitialize())
       {
         speaker.Beep();
@@ -210,21 +213,21 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -239,9 +242,8 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -258,9 +260,9 @@ void SystemClock_Config(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -272,14 +274,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

@@ -93,13 +93,6 @@ namespace hardware
 
         gyro_z = (float)(gz_raw / gyro_factor) * M_PI / 180.0f - offset_gz; // dps to deg/sec
         theta += gyro_z * sampling_period;
-
-        static int a = 0;
-        if (a % 200 == 0)
-        {
-            printf("%f\r\n", theta);
-        }
-        a++;
     }
 
     float IMU::GetAngle()
