@@ -29,11 +29,12 @@ xlim([0 2540]);
 h_axes = gca;
 h_axes.XAxis.FontSize = 20;
 h_axes.YAxis.FontSize = 20;
-%% システム同定
+%% システム同定のための準備
 exp_input = input(1:1270,1);
 val_input = input(1271:2540,1);
 exp_output = output(1:1270,1);
 val_output = output(1271:2540,1);
+%% システム同定
 systemIdentification
 %% 2022/07/05
 % Tp1 = 20.56

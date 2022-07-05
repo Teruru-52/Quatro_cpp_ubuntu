@@ -1,17 +1,12 @@
 % https://teruru-52.github.io/post/2022-03-22-rotation-curved-acceleration/
-
-clf;
-clear all;
 %% 目標値の生成
+clf;
+clear;
 close all
 t = 0;
 t1 = 0.03;
 t2 = 0.07;
 t3 = 0.1;
-
-% turn_L, turn_R
-% theta_ref = pi / 2;
-% t4 = 0.213;
 
 % U_turn
 theta_ref = pi;
@@ -94,40 +89,46 @@ h_axes = gca;
 h_axes.XAxis.FontSize = 20;
 h_axes.YAxis.FontSize = 20;
 
-figure(3);
-plot(a_tar, 'LineWidth', 2);
+% figure(3);
+% plot(a_tar, 'LineWidth', 2);
+% grid on;
+% xlabel('Time [ms]','Interpreter','latex','FontSize',20);
+% ylabel('$a_{ref}$ [rad/s$^2$]','Interpreter','latex','FontSize',20);
+% h_axes = gca;
+% h_axes.XAxis.FontSize = 20;
+% h_axes.YAxis.FontSize = 20;
+
+theta_tar(526)
+omega_tar(526)
+% a_tar(526)
+
+omega_tar = omega_tar';
+%% plot
+close all
+data= csvread('data_180.csv');
+theta = data(:,1);
+omega = data(:,2);
+
+figure(1);
+plot(theta_tar, 'LineWidth', 3);
+hold on;
 grid on;
+plot(theta, 'LineWidth', 3);
 xlabel('Time [ms]','Interpreter','latex','FontSize',20);
-ylabel('$a_{ref}$ [rad/s$^2$]','Interpreter','latex','FontSize',20);
+ylabel('$\theta$ [rad/s]','Interpreter','latex','FontSize',20);
+legend('$\theta_{ref}$','$\theta$','Interpreter','latex','Location','southeast','FontSize',20)
 h_axes = gca;
 h_axes.XAxis.FontSize = 20;
 h_axes.YAxis.FontSize = 20;
 
-theta_tar(526)
-omega_tar(526)
-a_tar(526)
-%%
-x_ref = csvread('x_ref.csv')*180/pi;
-v_ref = csvread('v_ref.csv');
-
-x = csvread('x_data.csv')*180/pi;
-v = csvread('v_data.csv');
-
 figure(2);
-% plot(v_ref)
-% hold on
-plot(v)
-grid on
-xlabel('Time [ms]');
-ylabel('\omega [rad/s]');
-legend('ref','data')
-
-figure(3);
-% plot(x_ref);
-% hold on
-plot(x);
-grid on
-xlabel('Time [ms]');
-% ylabel('\theta [rad]');
-ylabel('\theta [deg]');
-legend('ref','data','Location','southeast')
+plot(omega_tar, 'LineWidth', 3);
+hold on;
+grid on;
+plot(omega, 'LineWidth', 3);
+xlabel('Time [ms]','Interpreter','latex','FontSize',20);
+ylabel('$\omega$ [rad/s]','Interpreter','latex','FontSize',20);
+legend('$\omega_{ref}$','$\omega$','Interpreter','latex','Location','southeast','FontSize',20)
+h_axes = gca;
+h_axes.XAxis.FontSize = 20;
+h_axes.YAxis.FontSize = 20;
