@@ -1,4 +1,4 @@
-#include "controller/identification.h"
+#include "controller/m_identification.h"
 
 namespace undercarriage
 {
@@ -44,7 +44,7 @@ namespace undercarriage
         else
         {
             motor.Brake();
-            index = 0;
+            m_sequence.ResetTrajectoryIndex();
             flag = false;
         }
     }
