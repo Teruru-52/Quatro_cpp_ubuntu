@@ -89,7 +89,7 @@ namespace hardware
         int16_t gz_raw;
 
         // H:8bit shift, Link h and l
-        gz_raw = (int16_t)((uint16_t)(read_byte(0x47) << 8) | (uint16_t)read_byte(0x48));
+        gz_raw = (int16_t)((int16_t)(read_byte(0x47) << 8) | read_byte(0x48));
 
         gyro_z = (float)(gz_raw / gyro_factor) * M_PI / 180.0f - offset_gz; // dps to deg/sec
         theta += gyro_z * sampling_period;
