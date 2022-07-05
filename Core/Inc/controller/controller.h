@@ -16,10 +16,11 @@ namespace undercarriage
 
         void UpdateBatteryVoltage(float bat_vol);
         void PartyTrick(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
-        void PivotTurn180(std::vector<float> cur_vel);
+        void PivotTurn90(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
+        void PivotTurn180(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
         void KanayamaUpdateRef();
-        void KanayamaTurnLeft90(std::vector<float> cur_pos, std::vector<float> cur_vel);
-        void GoStraight(std::vector<float> cur_pos, std::vector<float> cur_vel, std::vector<uint32_t> ir_data);
+        void KanayamaTurnLeft90(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
+        void GoStraight(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel, std::vector<uint32_t> ir_data);
         void InputVelocity(float input_v, float input_w);
         bool GetFlag();
         float GetInput();
@@ -34,13 +35,14 @@ namespace undercarriage
         PID pid_ir_sensor_left;
         PID pid_ir_sensor_right;
         undercarriage::Kanayama kanayama;
-        trajectory::PivotTurn pivot_turn;
+        trajectory::PivotTurn180 pivot_turn180;
+        trajectory::PivotTurn90 pivot_turn90;
 
-        float tmp;
         float v_left;
         float v_right;
         float u_w;
         float u_v;
+        int ref_size;
         // std::vector<float> ref_pos;
         std::vector<float> ref_vel;
         float ref_w;
@@ -49,6 +51,9 @@ namespace undercarriage
         const float v_straight = 0.936196798079597;
         const float ir_straight = 1000;
         bool flag;
+        int index_log;
+        float *theta;
+        float *omega;
     };
 } // namespace undercarriage
 
