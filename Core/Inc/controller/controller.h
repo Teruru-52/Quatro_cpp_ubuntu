@@ -44,8 +44,8 @@ namespace undercarriage
         // std::vector<float> ref_pos;
         std::vector<float> ref_vel;
         float ref_w;
-        const float Tp1 = 37.67;
-        const float Kp = 105.1;
+        const float Tp1 = 20.56;
+        const float Kp = 137.9;
         const float v_straight = 0.936196798079597;
         const float ir_straight = 1000;
         bool flag;

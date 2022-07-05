@@ -4,7 +4,7 @@ namespace undercarriage
 {
     Controller::Controller(float control_period)
         : pid_angle(2.0, 2.0, 0.05, 0.0, control_period),
-          pid_rotational_vel(1.59, 60.0, -0.00213, 0.0, control_period),
+          pid_rotational_vel(0.80877, 37.1615, -0.0010359, 0.0060725, control_period),
           pid_traslational_vel(19.72, 52.0, 1.548, 0.0, control_period),
           pid_ir_sensor_left(1.0, 0.0, 0.0, 0.0, control_period),
           pid_ir_sensor_right(1.0, 0.0, 0.0, 0.0, control_period),
