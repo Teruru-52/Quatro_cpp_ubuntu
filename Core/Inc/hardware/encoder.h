@@ -20,7 +20,7 @@ namespace hardware
         float gear_ratio = 11.0f / 43.0f;
         float sampling_period; // [ms]
         float tire_radius;     // [m]
-        const int16_t ppr = 4096;
+        const float ppr = 2048.0;
         int16_t pulse_left;
         int16_t pulse_right;
     };

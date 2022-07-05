@@ -85,7 +85,7 @@ bool flag_interruption = false;
 
 std::vector<float> cur_pos{0, 0, 0};
 std::vector<float> cur_vel{0, 0};
-std::vector<uint32_t> ir_data;
+std::vector<uint32_t> ir_data{0, 0, 0, 0};
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -93,8 +93,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
     if (htim == &htim1) // interruption 16kHz
     {
-      irsensors.UpdateSideValue();
-      irsensors.UpdateFrontValue();
+      // irsensors.UpdateSideValue();
+      // irsensors.UpdateFrontValue();
 
       cnt16kHz = (cnt16kHz + 1) % 16;
 
@@ -110,15 +110,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         cur_pos = odom.GetPosition();
         cur_vel = odom.GetVelocity();
 
-        if (identification.GetFlag())
-        {
-          identification.IdenRotate(cur_vel);
-        }
-        else
-        {
-          flag_interruption = false;
-          mode = output;
-        }
+        // if (identification.GetFlag())
+        // {
+        //   identification.IdenRotate(cur_vel);
+        // }
+        // else
+        // {
+        //   flag_interruption = false;
+        //   mode = output;
+        // }
 
         // controller.PartyTrick(cur_pos, cur_vel);
 

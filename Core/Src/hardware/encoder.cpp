@@ -48,7 +48,7 @@ namespace hardware
 
     float Encoder::GetAngularVelocity(int16_t pulse)
     {
-        return pulse * (2.0 * M_PI / ppr) * gear_ratio / sampling_period;
+        return (float)pulse * (2.0 * M_PI / ppr) * gear_ratio / sampling_period / 4.0;
     }
 
     float Encoder::GetVelocity()

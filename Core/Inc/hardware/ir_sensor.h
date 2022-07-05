@@ -26,7 +26,7 @@ namespace hardware
         uint32_t ir_fr;
         uint32_t ir_sl;
         uint32_t ir_sr;
-        std::vector<uint32_t> ir_data;
+        std::vector<uint32_t> ir_data{0, 0, 0, 0};
 
         float bat_vol;
 
