@@ -1,41 +1,31 @@
 % M系列信号によるシステム同定
-%% 入力信号の確認
-figure(1);
-input = csvread('input.csv');
-stairs(0:127,input,'LineWidth',2);
-
-hold on;
-grid on;
-
-N = 127;
-input = idinput(N+1,'prbs',[0,1],[-3.0,3.0]);
-stairs(0:N,input,'LineWidth',1)
-
 %% M系列信号入力と応答
-input_iden = csvread('input_iden.csv');
-output_iden = csvread('output_iden.csv');
+data = csvread('data.csv');
 
-for i = 1:1:1271
-    if input_iden(i) > 0
-        input_iden(i) = 3.0;
-    else
-        input_iden(i) = -3.0;
-    end
-end
-figure(2);
-plot(input_iden);
-grid on;
+input = data(:, 1);
+output = data(:, 2);
 
-figure(3);
-plot(output_iden);
-grid on;
-xlabel('Time n','FontSize',20);
-ylabel('output [rad/s]','FontSize',20);
-xlim([0 1271]);
+figure(1);
+subplot(2,1,1);
+plot(input,'LineWidth',2);
+grid on
+xlabel('Time n','Interpreter','latex','FontSize',20);
+ylabel('$u_\omega$ [V]','Interpreter','latex','FontSize',20);
+xlim([0 1270]);
+ylim([-1.7 1.7]);
 h_axes = gca;
 h_axes.XAxis.FontSize = 20;
 h_axes.YAxis.FontSize = 20;
-grid on
+
+subplot(2,1,2);
+plot(output,'LineWidth',2);
+grid on;
+xlabel('Time n','Interpreter','latex','FontSize',20);
+ylabel('$\omega$ [rad/s]','Interpreter','latex','FontSize',20);
+xlim([0 1270]);
+h_axes = gca;
+h_axes.XAxis.FontSize = 20;
+h_axes.YAxis.FontSize = 20;
 %% システム同定
 systemIdentification
 
