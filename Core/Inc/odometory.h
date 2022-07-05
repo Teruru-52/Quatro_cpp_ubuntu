@@ -21,6 +21,8 @@ namespace undercarriage
         float x;
         float y;
         float theta;
+        std::vector<float> cur_pos{0, 0, 0};
+        std::vector<float> cur_vel{0, 0};
 
     public:
         Odometory(float sampling_period);
