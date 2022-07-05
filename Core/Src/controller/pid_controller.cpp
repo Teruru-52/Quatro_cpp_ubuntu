@@ -18,9 +18,12 @@ void Integrator::ResetIntegrator()
 Differentiator::Differentiator(float tf, float control_period)
     : tf(tf),
       control_period(control_period),
-      coeff(tf / (tf + control_period)),
+      //   coeff(tf / (tf + control_period)),
+      coeff(0),
       pre_error(0),
-      pre_deriv(0) {}
+      pre_deriv(0)
+{
+}
 
 float Differentiator::Update(float error)
 {
@@ -44,11 +47,21 @@ PID::PID(float kp, float ki, float kd, float tf, float control_period)
 
 float PID::Update(float error)
 {
-    return kp * error + ki * integrator.Update(error) + kd * differentiator.Update(error);
+    this->error = error;
+    sum = integrator.Update(error);
+    deriv = differentiator.Update(error);
+    // input = kp * error + ki * sum + kd * deriv;
+    input = kp * error;
+    return input;
 }
 
 void PID::ResetPID()
 {
     integrator.ResetIntegrator();
     differentiator.ResetDifferentiator();
+}
+
+void PID::OutputLog()
+{
+    printf("%f, %f\n", error, input);
 }

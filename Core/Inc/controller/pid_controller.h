@@ -41,11 +41,16 @@ public:
 
     float Update(float error);
     void ResetPID();
+    void OutputLog();
 
 private:
     float kp;
     float ki;
     float kd;
+    float error;
+    float sum;
+    float deriv;
+    float input;
     Integrator integrator;
     Differentiator differentiator;
 };
