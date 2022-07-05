@@ -17,7 +17,7 @@ namespace hardware
     void Encoder::Update_L()
     {
         pulse_left = 0;
-        uint16_t enc_buff = TIM3->CNT;
+        int16_t enc_buff = TIM3->CNT;
         TIM3->CNT = 0;
 
         if (enc_buff > 32767)
@@ -33,22 +33,22 @@ namespace hardware
     void Encoder::Update_R()
     {
         pulse_right = 0;
-        uint16_t enc_buff = TIM4->CNT;
+        int16_t enc_buff = TIM4->CNT;
         TIM4->CNT = 0;
 
         if (enc_buff > 32767)
         {
-            pulse_right = (int16_t)enc_buff * -1;
+            pulse_right = (int16_t)enc_buff;
         }
         else
         {
-            pulse_right = (int16_t)enc_buff;
+            pulse_right = (int16_t)enc_buff * -1;
         }
     }
 
     float Encoder::GetAngularVelocity(int16_t pulse)
     {
-        return pulse * (2.0 * M_PI / ppr) * gear_ratio / sampling_period;
+        return (float)pulse * (2.0 * M_PI / ppr) * gear_ratio / sampling_period / 4.0;
     }
 
     float Encoder::GetVelocity()
