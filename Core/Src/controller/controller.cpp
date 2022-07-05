@@ -9,7 +9,14 @@ namespace undercarriage
           pid_ir_sensor_left(1.0, 0.0, 0.0, 0.0, control_period),
           pid_ir_sensor_right(1.0, 0.0, 0.0, 0.0, control_period),
           kanayama(1.0, 1.0, 1.0),
-          flag(true) {}
+          flag(true),
+          index_log(0)
+    {
+        // ref_size = pivot_turn180.GetRefSize();
+        ref_size = pivot_turn90.GetRefSize();
+        theta = new float[ref_size];
+        omega = new float[ref_size];
+    }
 
     void Controller::UpdateBatteryVoltage(float bat_vol)
     {
@@ -21,24 +28,59 @@ namespace undercarriage
         // u_v = pid_traslational_vel.Update(-cur_vel[0]);
         u_v = 0.0;
         u_w = pid_angle.Update(-cur_pos[2]) + pid_rotational_vel.Update(-cur_vel[1]);
-        tmp = cur_pos[2];
         InputVelocity(u_v, u_w);
     }
 
-    // void Controller::PivotTurn180(std::vector<float> cur_vel)
-    // {
-    //     pivot_turn.UpdateRef();
-    //     ref_w = pivot_turn.GetRefVelocity();
-    //     u_w = pid_rotational_vel.Update(ref_w - cur_vel[1]) + Tp1 * ref_w / Kp;
-    //     InputVelocity(0.0, u_w);
-    // }
+    void Controller::PivotTurn90(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel)
+    {
+        if (pivot_turn90.GetFlag())
+        {
+            pivot_turn90.UpdateRef();
+            ref_w = pivot_turn90.GetRefVelocity();
+            u_v = 0;
+            u_w = pid_rotational_vel.Update(ref_w - cur_vel[1]) + Tp1 * ref_w / Kp;
+            InputVelocity(u_v, u_w);
+
+            theta[index_log] = cur_pos[2];
+            omega[index_log] = cur_vel[1];
+            index_log++;
+        }
+        else
+        {
+            motor.Brake();
+            pivot_turn90.ResetTrajectoryIndex();
+            flag = false;
+        }
+    }
+
+    void Controller::PivotTurn180(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel)
+    {
+        if (pivot_turn180.GetFlag())
+        {
+            pivot_turn180.UpdateRef();
+            ref_w = pivot_turn180.GetRefVelocity();
+            u_v = 0;
+            u_w = pid_rotational_vel.Update(ref_w - cur_vel[1]) + Tp1 * ref_w / Kp;
+            InputVelocity(u_v, u_w);
+
+            theta[index_log] = cur_pos[2];
+            omega[index_log] = cur_vel[1];
+            index_log++;
+        }
+        else
+        {
+            motor.Brake();
+            pivot_turn180.ResetTrajectoryIndex();
+            flag = false;
+        }
+    }
 
     // void Controller::KanayamaUpdateRef()
     // {
     //     kanayama.UpdateRef();
     // }
 
-    // void Controller::KanayamaTurnLeft90(std::vector<float> cur_pos, std::vector<float> cur_vel)
+    // void Controller::KanayamaTurnLeft90(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel)
     // {
     //     ref_vel = kanayama.CalcInput(cur_pos);
     //     u_v = pid_traslational_vel.Update(ref_vel[0] - cur_vel[0]);
@@ -46,7 +88,7 @@ namespace undercarriage
     //     InputVelocity(u_v, u_w);
     // }
 
-    // void Controller::GoStraight(std::vector<float> cur_pos, std::vector<float> cur_vel, std::vector<uint32_t> ir_data)
+    // void Controller::GoStraight(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel, std::vector<uint32_t> ir_data)
     // {
     //     u_v = pid_traslational_vel.Update(v_straight - cur_vel[0]);
     //     u_w = pid_ir_sensor_left.Update((float)(ir_straight - ir_data[2])) + pid_ir_sensor_right.Update((float)(ir_straight - ir_data[3])) + pid_angle.Update(-cur_pos[0]);
@@ -58,6 +100,11 @@ namespace undercarriage
         v_left = input_v - input_w;
         v_right = input_v + input_w;
         motor.Drive(v_left, v_right);
+    }
+
+    bool Controller::GetFlag()
+    {
+        return flag;
     }
 
     float Controller::GetInput()
@@ -73,8 +120,10 @@ namespace undercarriage
 
     void Controller::OutputLog()
     {
-        printf("%f, %f\n", u_v, u_w);
-        // pid_angle.OutputLog();
-        // printf("%f\n", tmp);
+        // printf("%f, %f\n", u_v, u_w);
+        for (int i = 0; i < ref_size; i++)
+        {
+            printf("%f, %f\n", theta[i], omega[i]);
+        }
     }
 }

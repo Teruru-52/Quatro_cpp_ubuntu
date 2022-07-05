@@ -2,6 +2,88 @@
 
 namespace trajectory
 {
+    // PivotTurn90
+    PivotTurn90::PivotTurn90()
+        : index(0),
+          flag(true)
+    {
+        ref_size = GetRefSize();
+    }
+
+    void PivotTurn90::ResetTrajectoryIndex()
+    {
+        index = 0;
+    }
+
+    void PivotTurn90::UpdateRef()
+    {
+        if (index < ref_size)
+        {
+            ref = ref_w[index];
+            index++;
+        }
+        else if (index == ref_size)
+        {
+            flag = false;
+        }
+    }
+
+    int PivotTurn90::GetRefSize()
+    {
+        return ref_w.size();
+    }
+
+    bool PivotTurn90::GetFlag()
+    {
+        return flag;
+    }
+
+    float PivotTurn90::GetRefVelocity()
+    {
+        return ref;
+    }
+
+    // PivotTurn180
+    PivotTurn180::PivotTurn180()
+        : index(0),
+          flag(true)
+    {
+        ref_size = GetRefSize();
+    }
+
+    void PivotTurn180::ResetTrajectoryIndex()
+    {
+        index = 0;
+    }
+
+    void PivotTurn180::UpdateRef()
+    {
+        if (index < ref_size)
+        {
+            ref = ref_w[index];
+            index++;
+        }
+        else if (index == ref_size)
+        {
+            flag = false;
+        }
+    }
+
+    int PivotTurn180::GetRefSize()
+    {
+        return ref_w.size();
+    }
+
+    bool PivotTurn180::GetFlag()
+    {
+        return flag;
+    }
+
+    float PivotTurn180::GetRefVelocity()
+    {
+        return ref;
+    }
+
     // TurnLeft
     TurnLeft90::TurnLeft90()
         : index(0) {}
@@ -33,42 +115,12 @@ namespace trajectory
         return ref_vel;
     }
 
-    // PivotTurn
-    PivotTurn::PivotTurn()
-        : index(0) {}
-
-    int PivotTurn::GetTrajectoryIndex()
-    {
-        return index;
-    }
-
-    void PivotTurn::ResetTrajectoryIndex()
-    {
-        index = 0;
-    }
-
-    void PivotTurn::UpdateRef()
-    {
-        ref = ref_u_w[index];
-        index++;
-    }
-
-    float PivotTurn::GetRefVelocity()
-    {
-        return ref;
-    }
-
     // M Sequence
     M_sequence::M_sequence()
         : index(0),
           flag(true)
     {
         ref_size = GetRefSize();
-    }
-
-    int M_sequence::GetTrajectoryIndex()
-    {
-        return index;
     }
 
     void M_sequence::ResetTrajectoryIndex()
