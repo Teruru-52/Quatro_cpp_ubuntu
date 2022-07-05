@@ -40,6 +40,7 @@ hardware::IRsensor irsensors(2300);
 hardware::Speaker speaker;
 undercarriage::Odometory odom(0.001);
 undercarriage::Controller controller(0.001);
+undercarriage::Identification identification;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -66,23 +67,29 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 char mode = 'i';
+
 char initialization = 'i';
 char slalom = 's';
 char translation = 't';
 char pivot_turn = 'p';
-char mode_select = 'm';
-char stop_movement = 'o';
+char stop_movement = 'x';
+char control = 'c';
+char output = 'o';
+char wait = 'w';
 
 int cnt16kHz = 0;
 int cnt1kHz = 0;
 
-std::vector<float> cur_pos{3};
-std::vector<float> cur_vel{2};
+float bat_vol;
+bool flag_interruption = false;
+
+std::vector<float> cur_pos{0, 0, 0};
+std::vector<float> cur_vel{0, 0};
 std::vector<uint32_t> ir_data;
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if (mode != initialization)
+  if (flag_interruption)
   {
     if (htim == &htim1) // interruption 16kHz
     {
@@ -94,12 +101,24 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       if (cnt16kHz == 0) // interruption 1kHz
       {
         cnt1kHz = (cnt1kHz + 1) % 1000;
-        controller.UpdateBatteryVoltage(irsensors.GetBatteryVoltage());
+        bat_vol = irsensors.GetBatteryVoltage();
+        // controller.UpdateBatteryVoltage(bat_vol);
+        identification.UpdateBatteryVoltage(bat_vol);
         irsensors.Update();
         ir_data = irsensors.GetIRSensorData();
         odom.Update();
         cur_pos = odom.GetPosition();
         cur_vel = odom.GetVelocity();
+
+        if (identification.GetFlag())
+        {
+          identification.IdenRotate(cur_vel);
+        }
+        else
+        {
+          flag_interruption = false;
+          mode = output;
+        }
 
         // controller.PartyTrick(cur_pos, cur_vel);
 
@@ -107,7 +126,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         {
           led.on_back_right();
           // odom.OutputLog();
-          printf("%f, %f\n", cur_pos[2], cur_vel[1]);
+          // controller.OutputLog();
+          // printf("%f, %f\n", cur_pos[2], cur_vel[1]);
+          // printf("%f\n", bat_vol);
           // printf("%lu\n", ir_data[0]);
         }
         else
@@ -205,7 +226,15 @@ int main(void)
         speaker.Beep();
         odom.Initialize();
         speaker.Beep();
-        mode = slalom; // slalom
+        flag_interruption = true;
+        mode = slalom;
+      }
+    }
+    else if (mode == output)
+    {
+      if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) == 0)
+      {
+        identification.OutputLog();
       }
     }
   }
