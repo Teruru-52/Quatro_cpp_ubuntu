@@ -3,7 +3,7 @@
 namespace undercarriage
 {
     Controller::Controller(float control_period)
-        : pid_angle(2.0, 2.0, 0.05, 0.0, control_period),
+        : pid_angle(5.0, 2.0, 0.05, 0.0, control_period),
           pid_rotational_vel(0.80877, 37.1615, -0.0010359, 0.0060725, control_period),
           pid_traslational_vel(6.3676, 84.2256, -0.0393, 0.014351, control_period),
           pid_ir_sensor_left(1.0, 0.0, 0.0, 0.0, control_period),
@@ -88,12 +88,13 @@ namespace undercarriage
     //     InputVelocity(u_v, u_w);
     // }
 
-    // void Controller::GoStraight(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel, std::vector<uint32_t> ir_data)
-    // {
-    //     u_v = pid_traslational_vel.Update(v_straight - cur_vel[0]);
-    //     u_w = pid_ir_sensor_left.Update((float)(ir_straight - ir_data[2])) + pid_ir_sensor_right.Update((float)(ir_straight - ir_data[3])) + pid_angle.Update(-cur_pos[0]);
-    //     InputVelocity(u_v, u_w);
-    // }
+    void Controller::GoStraight(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel, const std::vector<uint32_t> &ir_data)
+    {
+        u_v = pid_traslational_vel.Update(v_straight - cur_vel[0]);
+        // u_w = pid_ir_sensor_left.Update((float)(ir_straight - ir_data[2])) + pid_ir_sensor_right.Update((float)(ir_straight - ir_data[3])) + pid_angle.Update(-cur_pos[2]);
+        u_w = pid_angle.Update(-cur_pos[2]);
+        InputVelocity(u_v, u_w);
+    }
 
     void Controller::InputVelocity(float input_v, float input_w)
     {

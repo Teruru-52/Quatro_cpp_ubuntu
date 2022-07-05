@@ -20,7 +20,7 @@ namespace undercarriage
         void PivotTurn180(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
         void KanayamaUpdateRef();
         void KanayamaTurnLeft90(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
-        void GoStraight(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel, std::vector<uint32_t> ir_data);
+        void GoStraight(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel, const std::vector<uint32_t> &ir_data);
         void InputVelocity(float input_v, float input_w);
         bool GetFlag();
         float GetInput();

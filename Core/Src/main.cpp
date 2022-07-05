@@ -40,7 +40,6 @@ hardware::IRsensor irsensors(2300);
 hardware::Speaker speaker;
 undercarriage::Odometory odom(0.001);
 undercarriage::Controller controller(0.001);
-undercarriage::Step_Identification step_identification;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -85,7 +84,7 @@ bool flag_interruption = false;
 
 std::vector<float> cur_pos{0, 0, 0};
 std::vector<float> cur_vel{0, 0};
-std::vector<uint32_t> ir_data;
+std::vector<uint32_t> ir_data{0, 0, 0, 0};
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -102,25 +101,25 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       {
         cnt1kHz = (cnt1kHz + 1) % 1000;
         bat_vol = irsensors.GetBatteryVoltage();
-        // controller.UpdateBatteryVoltage(bat_vol);
-        step_identification.UpdateBatteryVoltage(bat_vol);
+        controller.UpdateBatteryVoltage(bat_vol);
         irsensors.Update();
         ir_data = irsensors.GetIRSensorData();
         odom.Update();
         cur_pos = odom.GetPosition();
         cur_vel = odom.GetVelocity();
 
-        if (step_identification.GetFlag())
-        {
-          step_identification.IdenTrans(cur_vel);
-        }
-        else
-        {
-          flag_interruption = false;
-          mode = output;
-        }
+        // if (step_identification.GetFlag())
+        // {
+        //   step_identification.IdenTrans(cur_vel);
+        // }
+        // else
+        // {
+        //   flag_interruption = false;
+        //   mode = output;
+        // }
 
         // controller.PartyTrick(cur_pos, cur_vel);
+        controller.GoStraight(cur_pos, cur_vel, ir_data);
 
         if (cnt1kHz == 0)
         {
@@ -131,8 +130,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
         if (cnt1kHz % 200 == 0)
         {
-          printf("%f, %f\n", cur_pos[0], cur_pos[1]);
-          // printf("%f, %f\n", cur_pos[2], cur_vel[1]);
+          // printf("%f, %f\n", cur_pos[0], cur_pos[1]);
+          printf("%f, %f\n", cur_pos[2], cur_vel[1]);
           // printf("%f\n", bat_vol);
           // printf("%lu\n", ir_data[0]);
         }
@@ -238,7 +237,7 @@ int main(void)
       if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) == 0)
       {
         // controller.OutputLog();
-        step_identification.OutputLog();
+        // step_identification.OutputLog();
       }
     }
   }
