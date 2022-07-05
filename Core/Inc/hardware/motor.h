@@ -12,14 +12,14 @@ namespace hardware
         // IRsensor battery;
 
         float bat_vol;
-        int max_input;
-        float duty_left;
-        float duty_right;
+        int max_input = 1600;
+        int duty_left;
+        int duty_right;
 
     public:
-        Motor(int max_input);
+        // Motor();
 
-        void UpdateBatteryVoltage(float battery);
+        void UpdateBatteryVoltage(float bat_vol);
         int GetDuty(float input_vol);
         void Drive(float v_left, float v_right);
         void Brake();
