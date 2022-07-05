@@ -17,7 +17,7 @@ namespace hardware
         tx_data[1] = 0x00; // dummy
 
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-        HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2, 10);
+        HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2, 1);
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 
         return rx_data[1];
@@ -33,7 +33,7 @@ namespace hardware
         tx_data[1] = data; // write data
 
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET); // CSピン立ち下げ
-        HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2, 10);
+        HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2, 1);
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET); // CSピン立ち上げ
     }
 
