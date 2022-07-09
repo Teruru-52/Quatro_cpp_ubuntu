@@ -52,11 +52,11 @@ end
 
 %% 設定情報
 % 点列の間隔 [mm]
-dx = 0.955;
+dx = 0.51;
 % 角速度と角加速度を設定
 % omega_dot = 150 * pi;
 % omega_max = 5 * pi;
-omega_dot = 50 * pi;
+omega_dot = 40 * pi;
 omega_max = 3 * pi;
 
 %% 必要情報の算出
@@ -207,7 +207,7 @@ grid on;
 % x[mm], y[mm], theta[rad]のCSV形式で保存
 pos(:,1) = pos(:,1)*0.001;
 pos(:,2) = pos(:,2)*0.001;
-omega = omega(1:151); 
+omega = omega(1:284); 
 pos = [pos omega];
 dlmwrite('ref.csv', pos, 'precision', '%.10f');
 % dlmwrite('disp_ref.csv', pos_disp', 'precision', '%.10f');

@@ -142,7 +142,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
         else if (mode == pivot_turn)
         {
-          if (controller.GetFlag() && cnt_pivot < 10)
+          // if (controller.GetFlag() && cnt_pivot < 10)
+          if (controller.GetFlag())
           {
             controller.PivotTurn180(cur_pos, cur_vel);
           }
@@ -150,9 +151,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
           {
             flag_interruption = false;
             controller.ResetFlag();
-            mode = wait;
-            cnt_pivot++;
-            // mode = output;
+            // mode = wait;
+            // cnt_pivot++;
+
+            mode = output;
           }
         }
 

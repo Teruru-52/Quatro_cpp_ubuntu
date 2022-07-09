@@ -44,11 +44,11 @@ namespace undercarriage
         float u_v;
         int ref_size;
         std::vector<float> ref_vel{0, 0};
-        const float Tp1_w = 20.56;
-        const float Kp_w = 137.9;
+        const float Tp1_w = 31.83;
+        const float Kp_w = 144.2;
         const float Tp1_v = 0.17158;
         const float Kp_v = 0.8293;
-        const float ref_v = 0.5481587246;
+        const float ref_v = 0.5064989;
         float ref_w;
         const float ir_straight = 1000;
         bool flag;

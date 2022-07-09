@@ -4,17 +4,17 @@ namespace undercarriage
 {
     Controller::Controller(float control_period)
         : pid_angle(5.0, 2.0, 0.05, 0.0, control_period),
-          pid_rotational_vel(0.80877, 37.1615, -0.0010359, 0.0060725, control_period),
+          pid_rotational_vel(1.1976, 85.1838, -0.00099, 0.0039227, control_period),
           pid_traslational_vel(6.3676, 84.2256, -0.0393, 0.014351, control_period),
           pid_ir_sensor_left(1.0, 0.0, 0.0, 0.0, control_period),
           pid_ir_sensor_right(1.0, 0.0, 0.0, 0.0, control_period),
-          kanayama(10.0, 10.0, 15.0),
+          kanayama(1.0, 1.0, 10.0),
           flag(true),
           index_log(0)
     {
         // ref_size = pivot_turn180.GetRefSize();
         // ref_size = pivot_turn90.GetRefSize();
-        ref_size = 152; // kanayama ref_time = 0.151678
+        ref_size = 284; // kanayama ref_time = 0.151678
         x = new float[ref_size];
         y = new float[ref_size];
         theta = new float[ref_size];
@@ -47,9 +47,9 @@ namespace undercarriage
             u_w = pid_rotational_vel.Update(ref_w - cur_vel[1]) + Tp1_w * ref_w / Kp_w;
             InputVelocity(u_v, u_w);
 
-            // theta[index_log] = cur_pos[2];
-            // omega[index_log] = cur_vel[1];
-            // index_log++;
+            theta[index_log] = cur_pos[2];
+            omega[index_log] = cur_vel[1];
+            index_log++;
         }
         else
         {

@@ -27,7 +27,7 @@ namespace undercarriage
         float ref_y;
         float ref_theta;
         float ref_w;
-        const float ref_v = 0.5481587246;
+        const float ref_v = 0.5064989;
         float x_e;
         float y_e;
         float theta_e;
