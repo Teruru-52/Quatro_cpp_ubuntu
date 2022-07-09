@@ -26,7 +26,7 @@ namespace undercarriage
         float u_w;
         bool flag;
         int index;
-        int ref_time = 3000; // [ms]
+        int ref_time = 2000; // [ms]
         float *output;
     };
 } // namespace undercarriage

@@ -40,6 +40,7 @@ hardware::IRsensor irsensors(2300);
 hardware::Speaker speaker;
 undercarriage::Odometory odom(0.001);
 undercarriage::Controller controller(0.001);
+undercarriage::Step_Identification step_identification;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -75,6 +76,7 @@ char stop_movement = 'x';
 char control = 'c';
 char output = 'o';
 char wait = 'w';
+char identification = 'm';
 
 int cnt16kHz = 0;
 int cnt1kHz = 0;
@@ -103,7 +105,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       {
         cnt1kHz = (cnt1kHz + 1) % 1000;
         bat_vol = irsensors.GetBatteryVoltage();
-        controller.UpdateBatteryVoltage(bat_vol);
+        // controller.UpdateBatteryVoltage(bat_vol);
+        step_identification.UpdateBatteryVoltage(bat_vol);
         irsensors.Update();
         ir_data = irsensors.GetIRSensorData();
         odom.Update();
@@ -158,6 +161,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
           }
         }
 
+        else if (identification)
+        {
+          if (step_identification.GetFlag())
+          {
+            step_identification.IdenTrans(cur_vel);
+          }
+          else
+          {
+            flag_interruption = false;
+            mode = output;
+          }
+        }
+
         if (cnt1kHz == 0)
         {
           led.on_back_right();
@@ -171,7 +187,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
           // printf("%f, %f\n", cur_pos[2], cur_vel[1]);
           // printf("%f, %f\n", cur_vel[0], cur_vel[1]);
           // printf("%f\n", bat_vol);
-          // printf("%lu, %lu\n", ir_data[2], ir_data[3]);
+          // printf("%lu, %lu,%lu, %lu\n", ir_data[0], ir_data[1],ir_data[2], ir_data[3]);
         }
       }
     }
@@ -238,6 +254,7 @@ int main(void)
   speaker.Beep();
   irsensors.BatteryCheck();
   irsensors.on_all_led();
+  HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -250,13 +267,13 @@ int main(void)
     if (mode == initialization)
     {
       irsensors.UpdateFrontValue();
-      if (irsensors.StartInitialize())
+      if (!irsensors.StartInitialize())
       {
         speaker.Beep();
         odom.Initialize();
         speaker.Beep();
         flag_interruption = true;
-        mode = translation;
+        mode = identification;
       }
     }
 
@@ -267,8 +284,8 @@ int main(void)
       {
         if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) == 0)
         {
-          controller.OutputLog();
-          // step_identification.OutputLog();
+          // controller.OutputLog();
+          step_identification.OutputLog();
         }
       }
       else if (mode == wait)
