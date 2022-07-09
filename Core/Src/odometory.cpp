@@ -3,8 +3,8 @@
 namespace undercarriage
 {
   Odometory::Odometory(float sampling_period)
-      : encoder(sampling_period, 0.0125),
-        imu(sampling_period, 16.4),
+      : encoder(sampling_period),
+        imu(sampling_period),
         sampling_period(sampling_period),
         x(0),
         y(0) {}
@@ -15,22 +15,27 @@ namespace undercarriage
     imu.CalcOffset();
   }
 
-  void Odometory::ResetOdometory()
+  void Odometory::Reset()
   {
     x = 0;
     y = 0;
+    imu.ResetTheta();
   }
 
   void Odometory::Update()
   {
     encoder.Update();
-    imu.Update();
 
     v = encoder.GetVelocity();
     omega = imu.GetAngularVelocity();
     theta = imu.GetAngle();
     x += v * cos(theta) * sampling_period;
     y += v * sin(theta) * sampling_period;
+  }
+
+  void Odometory::IMU_Update()
+  {
+    imu.Update();
   }
 
   std::vector<float> Odometory::GetPosition()

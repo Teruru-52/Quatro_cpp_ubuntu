@@ -18,11 +18,11 @@ namespace undercarriage
         void PartyTrick(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
         void PivotTurn90(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
         void PivotTurn180(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
-        void KanayamaUpdateRef();
         void KanayamaTurnLeft90(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel);
         void GoStraight(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel, const std::vector<uint32_t> &ir_data);
         void InputVelocity(float input_v, float input_w);
         bool GetFlag();
+        void ResetFlag();
         float GetInput();
         void MotorTest(float v_left, float v_right);
         void OutputLog();
@@ -43,17 +43,23 @@ namespace undercarriage
         float u_w;
         float u_v;
         int ref_size;
-        // std::vector<float> ref_pos;
-        std::vector<float> ref_vel;
+        std::vector<float> ref_vel{0, 0};
+        const float Tp1_w = 20.56;
+        const float Kp_w = 137.9;
+        const float Tp1_v = 0.17158;
+        const float Kp_v = 0.8293;
+        const float ref_v = 0.5481587246;
         float ref_w;
-        const float Tp1 = 20.56;
-        const float Kp = 137.9;
-        const float v_straight = 0.936196798079597;
         const float ir_straight = 1000;
         bool flag;
         int index_log;
+        float *x;
+        float *y;
         float *theta;
+        float *v;
         float *omega;
+        float *kanayama_v;
+        float *kanayama_w;
     };
 } // namespace undercarriage
 

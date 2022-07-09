@@ -8,7 +8,7 @@ namespace hardware
     class Encoder
     {
     public:
-        Encoder(float sampling_period, float tire_radius);
+        Encoder(float sampling_period);
 
         void Update();
         void Update_L();
@@ -18,8 +18,8 @@ namespace hardware
 
     private:
         float gear_ratio = 11.0f / 43.0f;
-        float sampling_period; // [ms]
-        float tire_radius;     // [m]
+        float sampling_period;      // [ms]
+        float tire_radius = 0.0125; // [m]
         const float ppr = 2048.0;
         int16_t pulse_left;
         int16_t pulse_right;

@@ -38,6 +38,11 @@ namespace trajectory
         return flag;
     }
 
+    void PivotTurn90::ResetFlag()
+    {
+        flag = true;
+    }
+
     float PivotTurn90::GetRefVelocity()
     {
         return ref;
@@ -79,6 +84,11 @@ namespace trajectory
         return flag;
     }
 
+    void PivotTurn180::ResetFlag()
+    {
+        flag = true;
+    }
+
     float PivotTurn180::GetRefVelocity()
     {
         return ref;
@@ -86,11 +96,10 @@ namespace trajectory
 
     // TurnLeft
     TurnLeft90::TurnLeft90()
-        : index(0) {}
-
-    int TurnLeft90::GetTrajectoryIndex()
+        : index(0),
+          flag(true)
     {
-        return index;
+        ref_size = GetRefSize();
     }
 
     void TurnLeft90::ResetTrajectoryIndex()
@@ -98,21 +107,32 @@ namespace trajectory
         index = 0;
     }
 
+    int TurnLeft90::GetRefSize()
+    {
+        return ref_csv.size();
+    }
+
     void TurnLeft90::UpdateRef()
     {
-        // ref_pos = ref_pos_csv[index];
-        // ref_vel = ref_vel_csv[index];
-        index++;
+        if (index < ref_size - 1)
+        {
+            ref = ref_csv[index];
+            index++;
+        }
+        else if (index == ref_size - 1)
+        {
+            flag = false;
+        }
     }
 
-    std::vector<float> TurnLeft90::GetRefPosition()
+    std::vector<float> TurnLeft90::GetRef()
     {
-        return ref_pos;
+        return ref_csv[index];
     }
 
-    std::vector<float> TurnLeft90::GetRefVelocity()
+    bool TurnLeft90::GetFlag()
     {
-        return ref_vel;
+        return flag;
     }
 
     // M Sequence

@@ -29,7 +29,8 @@ namespace undercarriage
 
         void Initialize();
         void Update();
-        void ResetOdometory();
+        void IMU_Update();
+        void Reset();
         std::vector<float> GetPosition();
         std::vector<float> GetVelocity();
         void OutputLog();

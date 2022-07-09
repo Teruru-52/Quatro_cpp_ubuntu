@@ -12,7 +12,7 @@ namespace hardware
     private:
         LED led;
         const int sampling_count = 16;
-        uint32_t threshold; // 2100
+        uint32_t threshold;
 
         uint16_t dma_f[3];
         uint16_t dma_b[2];
@@ -27,6 +27,7 @@ namespace hardware
         uint32_t ir_sl;
         uint32_t ir_sr;
         std::vector<uint32_t> ir_data{0, 0, 0, 0};
+        bool flag;
 
         float bat_vol;
 
@@ -50,6 +51,7 @@ namespace hardware
         float GetBatteryVoltage();
         void BatteryCheck();
         bool StartInitialize();
+        bool GetFrontWallFlag();
     };
 }
 #endif //  HARDWARE_IR_SENSOR_HPP_

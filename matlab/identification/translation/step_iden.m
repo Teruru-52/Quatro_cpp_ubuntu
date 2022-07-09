@@ -15,3 +15,10 @@ h_axes.XAxis.FontSize = 20;
 h_axes.YAxis.FontSize = 20;
 %% 
 pidTuner()
+%%
+%             Kp                      
+%   G(s) = ----------                  
+%           1+Tp1*s                    
+%                                      
+%         Kp = 0.8293                  
+%        Tp1 = 0.17158 

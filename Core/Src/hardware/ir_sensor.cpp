@@ -3,7 +3,8 @@
 namespace hardware
 {
     IRsensor::IRsensor(uint32_t threshold)
-        : threshold(threshold) {}
+        : threshold(threshold),
+          flag(false) {}
 
     void IRsensor::on_front_led()
     {
@@ -170,5 +171,14 @@ namespace hardware
             return true;
         else
             return false;
+    }
+
+    bool IRsensor::GetFrontWallFlag()
+    {
+        if (ir_fl > 2100 && ir_fr > 2100)
+        {
+            flag = true;
+        }
+        return flag;
     }
 }

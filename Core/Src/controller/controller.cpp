@@ -8,14 +8,20 @@ namespace undercarriage
           pid_traslational_vel(6.3676, 84.2256, -0.0393, 0.014351, control_period),
           pid_ir_sensor_left(1.0, 0.0, 0.0, 0.0, control_period),
           pid_ir_sensor_right(1.0, 0.0, 0.0, 0.0, control_period),
-          kanayama(1.0, 1.0, 1.0),
+          kanayama(10.0, 10.0, 15.0),
           flag(true),
           index_log(0)
     {
         // ref_size = pivot_turn180.GetRefSize();
-        ref_size = pivot_turn90.GetRefSize();
+        // ref_size = pivot_turn90.GetRefSize();
+        ref_size = 152; // kanayama ref_time = 0.151678
+        x = new float[ref_size];
+        y = new float[ref_size];
         theta = new float[ref_size];
+        v = new float[ref_size];
         omega = new float[ref_size];
+        kanayama_v = new float[ref_size];
+        kanayama_w = new float[ref_size];
     }
 
     void Controller::UpdateBatteryVoltage(float bat_vol)
@@ -38,17 +44,18 @@ namespace undercarriage
             pivot_turn90.UpdateRef();
             ref_w = pivot_turn90.GetRefVelocity();
             u_v = 0;
-            u_w = pid_rotational_vel.Update(ref_w - cur_vel[1]) + Tp1 * ref_w / Kp;
+            u_w = pid_rotational_vel.Update(ref_w - cur_vel[1]) + Tp1_w * ref_w / Kp_w;
             InputVelocity(u_v, u_w);
 
-            theta[index_log] = cur_pos[2];
-            omega[index_log] = cur_vel[1];
-            index_log++;
+            // theta[index_log] = cur_pos[2];
+            // omega[index_log] = cur_vel[1];
+            // index_log++;
         }
         else
         {
             motor.Brake();
             pivot_turn90.ResetTrajectoryIndex();
+            pivot_turn90.ResetFlag();
             flag = false;
         }
     }
@@ -60,7 +67,7 @@ namespace undercarriage
             pivot_turn180.UpdateRef();
             ref_w = pivot_turn180.GetRefVelocity();
             u_v = 0;
-            u_w = pid_rotational_vel.Update(ref_w - cur_vel[1]) + Tp1 * ref_w / Kp;
+            u_w = pid_rotational_vel.Update(ref_w - cur_vel[1]) + Tp1_w * ref_w / Kp_w;
             InputVelocity(u_v, u_w);
 
             theta[index_log] = cur_pos[2];
@@ -72,25 +79,40 @@ namespace undercarriage
             motor.Brake();
             pivot_turn180.ResetTrajectoryIndex();
             flag = false;
+            pivot_turn180.ResetFlag();
         }
     }
 
-    // void Controller::KanayamaUpdateRef()
-    // {
-    //     kanayama.UpdateRef();
-    // }
+    void Controller::KanayamaTurnLeft90(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel)
+    {
+        if (kanayama.GetFlag())
+        {
+            kanayama.UpdateRef();
+            ref_vel = kanayama.CalcInput(cur_pos);
+            u_v = pid_traslational_vel.Update(ref_vel[0] - cur_vel[0]) + Tp1_v * ref_vel[0] / Kp_v;
+            u_w = pid_rotational_vel.Update(ref_vel[1] - cur_vel[1]) + Tp1_w * ref_vel[1] / Kp_w;
+            InputVelocity(u_v, u_w);
 
-    // void Controller::KanayamaTurnLeft90(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel)
-    // {
-    //     ref_vel = kanayama.CalcInput(cur_pos);
-    //     u_v = pid_traslational_vel.Update(ref_vel[0] - cur_vel[0]);
-    //     u_w = pid_rotational_vel.Update(ref_vel[1] - cur_vel[1]) + Tp1 * ref_w / Kp;
-    //     InputVelocity(u_v, u_w);
-    // }
+            x[index_log] = cur_pos[0];
+            y[index_log] = cur_pos[1];
+            theta[index_log] = cur_pos[2];
+            v[index_log] = cur_vel[0];
+            omega[index_log] = cur_vel[1];
+            kanayama_v[index_log] = ref_vel[0];
+            kanayama_w[index_log] = ref_vel[1];
+            index_log++;
+        }
+        else
+        {
+            motor.Brake();
+            kanayama.ResetTrajectoryIndex();
+            flag = false;
+        }
+    }
 
     void Controller::GoStraight(const std::vector<float> &cur_pos, const std::vector<float> &cur_vel, const std::vector<uint32_t> &ir_data)
     {
-        u_v = pid_traslational_vel.Update(v_straight - cur_vel[0]);
+        u_v = pid_traslational_vel.Update(ref_v - cur_vel[0]) + Tp1_v * ref_v / Kp_v;
         // u_w = pid_ir_sensor_left.Update((float)(ir_straight - ir_data[2])) + pid_ir_sensor_right.Update((float)(ir_straight - ir_data[3])) + pid_angle.Update(-cur_pos[2]);
         u_w = pid_angle.Update(-cur_pos[2]);
         InputVelocity(u_v, u_w);
@@ -106,6 +128,11 @@ namespace undercarriage
     bool Controller::GetFlag()
     {
         return flag;
+    }
+
+    void Controller::ResetFlag()
+    {
+        flag = true;
     }
 
     float Controller::GetInput()
@@ -124,7 +151,8 @@ namespace undercarriage
         // printf("%f, %f\n", u_v, u_w);
         for (int i = 0; i < ref_size; i++)
         {
-            printf("%f, %f\n", theta[i], omega[i]);
+            printf("%f, %f, %f, %f, %f, %f, %f\n", x[i], y[i], theta[i], v[i], omega[i], kanayama_v[i], kanayama_w[i]);
+            // printf("%f, %f\n", theta[i], omega[i]);
         }
     }
 }

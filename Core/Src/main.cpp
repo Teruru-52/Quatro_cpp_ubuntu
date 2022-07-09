@@ -18,9 +18,6 @@
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <vector>
-#include <cmath>
-
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
@@ -28,8 +25,11 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <vector>
+#include <cmath>
 #include "my_header.h"
 /* USER CODE END Includes */
 
@@ -78,9 +78,11 @@ char wait = 'w';
 
 int cnt16kHz = 0;
 int cnt1kHz = 0;
+int cnt_pivot = 0;
 
 float bat_vol;
 bool flag_interruption = false;
+bool flag_odometory = true;
 
 std::vector<float> cur_pos{0, 0, 0};
 std::vector<float> cur_vel{0, 0};
@@ -108,18 +110,51 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         cur_pos = odom.GetPosition();
         cur_vel = odom.GetVelocity();
 
-        // if (step_identification.GetFlag())
-        // {
-        //   step_identification.IdenTrans(cur_vel);
-        // }
-        // else
-        // {
-        //   flag_interruption = false;
-        //   mode = output;
-        // }
+        if (mode == translation)
+        {
+          controller.GoStraight(cur_pos, cur_vel, ir_data);
+          if (irsensors.GetFrontWallFlag())
+          {
+            mode = slalom;
+          }
+        }
 
-        // controller.PartyTrick(cur_pos, cur_vel);
-        controller.GoStraight(cur_pos, cur_vel, ir_data);
+        else if (mode == slalom)
+        {
+          if (flag_odometory)
+          {
+            odom.Reset();
+            cur_pos = odom.GetPosition();
+            cur_vel = odom.GetVelocity();
+            flag_odometory = false;
+          }
+
+          if (controller.GetFlag())
+          {
+            controller.KanayamaTurnLeft90(cur_pos, cur_vel);
+          }
+          else
+          {
+            flag_interruption = false;
+            mode = output;
+          }
+        }
+
+        else if (mode == pivot_turn)
+        {
+          if (controller.GetFlag() && cnt_pivot < 10)
+          {
+            controller.PivotTurn180(cur_pos, cur_vel);
+          }
+          else
+          {
+            flag_interruption = false;
+            controller.ResetFlag();
+            mode = wait;
+            cnt_pivot++;
+            // mode = output;
+          }
+        }
 
         if (cnt1kHz == 0)
         {
@@ -131,20 +166,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         if (cnt1kHz % 200 == 0)
         {
           // printf("%f, %f\n", cur_pos[0], cur_pos[1]);
-          printf("%f, %f\n", cur_pos[2], cur_vel[1]);
+          // printf("%f, %f\n", cur_pos[2], cur_vel[1]);
+          // printf("%f, %f\n", cur_vel[0], cur_vel[1]);
           // printf("%f\n", bat_vol);
-          // printf("%lu\n", ir_data[0]);
+          // printf("%lu, %lu\n", ir_data[2], ir_data[3]);
         }
-
-        // else if(mode == slalom){
-
-        // }
-        // else if(mode == translation){
-
-        // }
-        // else if(mode == pivot_turn){
-
-        // }
       }
     }
   }
@@ -219,25 +245,35 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    // led.on_all();
     if (mode == initialization)
     {
-      irsensors.UpdateFrontValue(); // Read Battery Voltage
+      irsensors.UpdateFrontValue();
       if (irsensors.StartInitialize())
       {
         speaker.Beep();
         odom.Initialize();
         speaker.Beep();
         flag_interruption = true;
-        mode = slalom;
+        mode = translation;
       }
     }
-    else if (mode == output)
+
+    else
     {
-      if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) == 0)
+      odom.IMU_Update();
+      if (mode == output)
       {
-        // controller.OutputLog();
-        // step_identification.OutputLog();
+        if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) == 0)
+        {
+          controller.OutputLog();
+          // step_identification.OutputLog();
+        }
+      }
+      else if (mode == wait)
+      {
+        HAL_Delay(500);
+        mode = pivot_turn;
+        flag_interruption = true;
       }
     }
   }

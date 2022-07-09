@@ -13,19 +13,26 @@ namespace undercarriage
         Kanayama(float Kx, float Ky, float Ktheta);
 
         void UpdateRef();
+        void ResetTrajectoryIndex();
         std::vector<float> CalcInput(std::vector<float> cur_pos);
+        bool GetFlag();
 
     private:
         trajectory::TurnLeft90 turnleft90;
         float Kx;
         float Ky;
         float Ktheta;
-        std::vector<float> ref_pos;
-        std::vector<float> ref_vel;
+        std::vector<float> ref;
+        float ref_x;
+        float ref_y;
+        float ref_theta;
+        float ref_w;
+        const float ref_v = 0.5481587246;
         float x_e;
         float y_e;
         float theta_e;
         std::vector<float> ref_u;
+        bool flag;
     };
 } // namespace undercarriage
 

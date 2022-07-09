@@ -2,9 +2,8 @@
 
 namespace hardware
 {
-    IMU::IMU(float sampling_period, float gyro_factor)
+    IMU::IMU(float sampling_period)
         : sampling_period(sampling_period),
-          gyro_factor(gyro_factor),
           theta(0),
           offset_gz(0) {}
 
@@ -17,7 +16,7 @@ namespace hardware
         tx_data[1] = 0x00; // dummy
 
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-        HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2, 1);
+        HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2, 10);
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 
         return rx_data[1];
@@ -33,13 +32,15 @@ namespace hardware
         tx_data[1] = data; // write data
 
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET); // CSピン立ち下げ
-        HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2, 1);
+        HAL_SPI_TransmitReceive(&hspi1, tx_data, rx_data, 2, 10);
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET); // CSピン立ち上げ
     }
 
     void IMU::Initialize()
     {
         uint8_t who_am_i;
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+        __HAL_SPI_ENABLE(&hspi1); // clockが動かないように、あらかじめEnableにしておく
 
         HAL_Delay(100);                          // wait start up
         who_am_i = read_byte(0x75);              // read who am i
@@ -68,9 +69,8 @@ namespace hardware
         for (int i = 0; i < 1000; i++)
         {
             // H:8bit shift, Link h and l
-            gz_raw = (int16_t)((uint16_t)(read_byte(0x47) << 8) | (uint16_t)read_byte(0x48));
-            // printf("%d\r\n", gz_raw);
-            gyro_z = (float)(gz_raw / gyro_factor) * M_PI / 180.0f; // dps to rad/sec
+            gz_raw = (int16_t)((int16_t)(read_byte(0x47) << 8) | read_byte(0x48));
+            gyro_z = (float)(gz_raw) / gyro_factor * M_PI / 180.0f; // dps to rad/sec
 
             gz_sum += gyro_z;
             HAL_Delay(1);
@@ -90,19 +90,23 @@ namespace hardware
 
         // H:8bit shift, Link h and l
         gz_raw = (int16_t)((int16_t)(read_byte(0x47) << 8) | read_byte(0x48));
-
-        gyro_z = (float)(gz_raw / gyro_factor) * M_PI / 180.0f - offset_gz; // dps to deg/sec
-        theta += gyro_z * sampling_period;
+        gyro_z = (float)(gz_raw) / gyro_factor * M_PI / 180.0f - offset_gz; // dps to deg/sec
     }
 
     float IMU::GetAngle()
     {
+        theta += gyro_z * sampling_period;
         return theta;
     }
 
     float IMU::GetAngularVelocity()
     {
         return gyro_z;
+    }
+
+    void IMU::ResetTheta()
+    {
+        theta = 0.0;
     }
 
 } // namespace hardware

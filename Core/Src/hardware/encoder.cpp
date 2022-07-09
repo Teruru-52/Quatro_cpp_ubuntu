@@ -4,9 +4,8 @@
 
 namespace hardware
 {
-    Encoder::Encoder(float sampling_period, float tire_radius)
-        : sampling_period(sampling_period),
-          tire_radius(tire_radius) {}
+    Encoder::Encoder(float sampling_period)
+        : sampling_period(sampling_period) {}
 
     void Encoder::Update()
     {

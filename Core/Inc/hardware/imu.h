@@ -8,7 +8,7 @@ namespace hardware
     class IMU
     {
     public:
-        IMU(float sampling_period, float gyro_factor);
+        IMU(float sampling_period);
 
         uint8_t read_byte(uint8_t reg);
         void write_byte(uint8_t reg, uint8_t data);
@@ -20,10 +20,13 @@ namespace hardware
         // void UpdateAcc();
         float GetAngle();
         float GetAngularVelocity();
+        void ResetTheta();
 
     private:
         float sampling_period;
-        float gyro_factor;
+        // default
+        // const float gyro_factor = 16.4;
+        const float gyro_factor = 15.6;
 
         float theta;
         float gyro_z;
